@@ -1,0 +1,2931 @@
+* {
+   box-sizing:border-box;
+   cursor: url('img/icons/cursor.png'), auto;
+}
+
+html,body
+{
+	/* eliminate whitespace */
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: visible;
+	scrollbar-width: none; /* disable srcrollbar for firefox */
+}
+
+/* remove spacing between html elements */
+body {
+	font-size: 0px;
+	/*font-family: Impact;*/
+	font-family:Arial Narrow, sans-serif;
+	color: goldenrod;
+	background-color: black;
+}
+
+/* disables scroll bar b/c it messes with % units like margins */
+body::-webkit-scrollbar {
+	display: none;
+}
+
+main {
+	position:absolute;
+	width: 100%;
+	height: calc(100vw * 1080 / 1920);
+	background-image: url('img/board.jpg');
+	background-size: 100% auto;
+	background-repeat: no-repeat;
+}
+
+/* ---------------- responsive fit wrapper ----------------
+   No-op (display:contents) until fit-screen.js activates .fit-active for
+   viewports that don't fit the 16:9 canvas. */
+#screen-scale {
+	display: contents;
+}
+#screen-scale.fit-active {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: calc(100vw * 1080 / 1920);
+	transform-origin: 0 0;
+	/* transform is set inline by fit-screen.js */
+	/* Clip so off-canvas elements (e.g. #hand-op) stay hidden once transformed. */
+	overflow: hidden;
+}
+/* While fitting, suppress scrollbars so the letter/pillarbox bars are clean. */
+body.fit-active {
+	overflow: hidden;
+}
+
+/* makes text seleciton and highlighting invisible */
+::selection { background: transparent; }		/* WebKit/Blink Browsers */
+::-moz-selection { background: transparent; }	/* Gecko Browsers */
+
+::-webkit-scrollbar {
+  width: 1.5vw;
+}
+::-webkit-scrollbar-thumb {
+  background: #5559;
+  border-radius: .5vw;
+  height: 3vw;
+  border: .35vw double black;
+}
+::-webkit-scrollbar-track {
+  background: #131313;
+}
+
+html {
+	scrollbar-color: #5559 #131313; /* mozilla */
+}
+
+#click-background {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+#hand-op {
+	position:absolute;
+	height: 6.35vw;
+	width: 4.45vw;
+	top:-7vw;
+	left: 33vw;
+	
+	border: 1px solid blue;
+}
+
+#hand-op .card { position : absolute; }
+
+#exit-game
+{
+	top: 1.4vw;
+	left: 1vw;
+	position: absolute;
+	width: 2vw;
+	height: 2vw;
+	background-image: url("svg/exit.svg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	opacity: 20%;
+	transition: opacity 0.3s;
+	pointer-events: auto;
+}
+#exit-game:hover {
+	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
+	opacity: 100%;
+}
+
+#match-fullscreen-toggle
+{
+	top: 1.4vw;
+	right: 1vw;
+	position: absolute;
+	width: 2vw;
+	height: 2vw;
+	background-image: url("svg/fullscreen-gold.svg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	opacity: 20%;
+	transition: opacity 0.3s;
+	pointer-events: auto;
+	cursor: pointer;
+}
+#match-fullscreen-toggle:hover {
+	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
+	opacity: 100%;
+}
+#match-fullscreen-toggle.is-fullscreen {
+	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
+	opacity: 100%;
+}
+
+/* Touch has no hover, so give these a visible baseline opacity instead of 20%. */
+@media (hover: none) {
+	#exit-game, #match-fullscreen-toggle {
+		opacity: 55%;
+	}
+}
+
+/* ----------- settings & local media ------------------ */
+
+.settings-button {
+	position: absolute;
+	width: 2.5vw;
+	height: 2.5vw;
+}
+.settings-button>img{
+	width: 2.5vw;
+	height: 2.5vw;
+	filter:drop-shadow(0px 0px 2px black);
+}
+
+.settings-button.fade>img {
+	 opacity: 0.2; 
+}
+
+.settings-button.fade:hover>img {
+	opacity: 0.3;
+}
+.settings-button:hover>img {
+	filter:drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.5));
+}
+
+#toggle-music {
+    top: 48.9vw;
+    left: 14vw;
+}
+/* Reuse the lobby's fixed bottom-left cluster instead of the old inline position. */
+#toggle-music.deck-menu,
+#toggle-music.lobby-menu {
+	position: fixed;
+	bottom: 2vh;
+	top: auto;
+	left: 1.5vw;
+	z-index: 95;
+}
+
+#toggle-sfx {
+	top: 48.9vw;
+    left: 17.2vw;
+}
+#toggle-sfx.deck-menu,
+#toggle-sfx.lobby-menu {
+	position: fixed;
+	bottom: 2vh;
+	top: auto;
+	left: 5vw;
+	z-index: 95;
+}
+
+#toggle-notifications {
+	top: 48.9vw;
+    left: 20vw;
+}
+#toggle-notifications.deck-menu,
+#toggle-notifications.lobby-menu {
+	position: fixed;
+	bottom: 2vh;
+	top: auto;
+	left: 8.5vw;
+	z-index: 95;
+}
+
+#pass-button[data-title]:hover::after
+{
+	bottom: -2.2vw;
+	left: -0.45vw
+}
+
+
+/* ----------- notification bar ------------------ */
+
+#notification-bar {
+	position:absolute;
+	width:100%;
+	height: 14%;
+	top: 43%;
+	background-color: rgba(10,10,10,0.95);
+	opacity: 0;
+	z-index: 100;
+}
+
+#notification-bar > div { 
+	width: 22.1%;
+	height: 207.25%;
+	top: -66.6%;
+	left: 22.55%;
+	position: absolute;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+}
+
+#notification-bar > div::after {
+	content: attr(data-text);
+	position: absolute;
+	left: 100.5%;
+	top: 32.1%;
+	width: 205%;
+	height: 47.25%;
+	color: goldenrod;
+	font-size: 1.6vw;
+	text-align:left;
+	font-weight:bold;
+	display: flex;
+	align-items: center;
+}
+
+#notif-me-coin { background-image: url('img/icons/notif_me_coin.png'); }
+#notif-op-coin { background-image: url('img/icons/notif_op_coin.png'); }
+#notif-round-start { background-image: url('img/icons/notif_round_start.png'); }
+#notif-me-pass { background-image: url('img/icons/notif_round_passed.png'); }
+#notif-op-pass { background-image: url('img/icons/notif_round_passed.png'); }
+#notif-win-round { background-image: url('img/icons/notif_win_round.png'); }
+#notif-lose-round { background-image: url('img/icons/notif_lose_round.png'); }
+#notif-draw-round { background-image: url('img/icons/notif_draw_round.png'); }
+#notif-me-turn { background-image: url('img/icons/notif_me_turn.png'); }
+#notif-op-turn { background-image: url('img/icons/notif_op_turn.png'); }
+#notif-op-redraw { background-image: url('img/icons/notif_op_turn.png'); }
+#notif-north { background-image: url('img/icons/notif_north.png'); }
+#notif-monsters { background-image: url('img/icons/notif_monsters.png'); }
+#notif-scoiatael { background-image: url('img/icons/notif_scoiatael.png'); }
+#notif-skellige-op{ background-image: url('img/icons/notif_skellige.png'); }
+#notif-skellige-me{ background-image: url('img/icons/notif_skellige.png'); }
+
+/* ------- card preview ------------- */
+
+.card-preview { position: relative; z-index: 80;}
+.card-preview > .card-lg {
+	position: absolute;
+	top: 11.95vw;
+	left: 80.3vw;
+}
+.card-preview > .card-description {
+	top: 43.1vw;
+	left: 67.95vw;
+}
+
+.card-lg {
+	height: 30.4vw;
+	width: 16.1vw;
+	border-radius: 1.5vw;
+	
+	background-size: contain;
+	background-position:center;
+}
+.card-description {
+	position: absolute;
+
+	height: 7.87vw;
+	width: 29.12vw;
+	background-color: rgba(20,20,20, 0.95);
+	color: tan;
+	text-align: center;
+	pointer-events : none;
+	border: .1vw solid #ffffff57;
+    border-width: .1vw 0;
+}
+
+.card-description > * { position: relative; }
+
+.card-description > div {
+	top: 1.0vw;
+	left: 0.9vw;
+	width: 1.95vw;
+	height: 1.95vw;
+	margin-bottom: -1.9vw;
+	background-size:cover;
+	background-position:center;
+}
+
+.card-description > h1 {
+	font-weight: bold;
+	
+	top: 0.5vw;
+	left: 16%;
+	height: 16%;
+	width: 70%;
+	margin-bottom: -2.1vw;
+	text-transform: capitalize;
+	
+	font-size: 1vw;
+}
+
+.card-description > p {
+	top: 37%;
+	left: 5%;
+	width: 90%;
+	height:50%;
+
+	font-size: 0.9vw;
+}
+
+/* Temporarily dismiss a card's effect description so the cards behind it
+   (deck / carousel) are visible. The description re-appears the next time it
+   is shown for a card (e.g. navigating the carousel or opening a new preview),
+   so this is a per-view, non-persistent close. */
+.card-description > .card-description-close {
+	position: absolute;
+	top: 0.25vw;
+	right: 0.35vw;
+	width: 1.6vw;
+	height: 1.6vw;
+	padding: 0;
+	border: 0.1vw solid #ffffff57;
+	border-radius: 50%;
+	background-color: rgba(10,10,10,.6);
+	color: tan;
+	font-family: serif;
+	font-size: 0;
+	line-height: 1;
+	pointer-events: auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.card-description > .card-description-close::before {
+	/* Replaces the hidden × text, nudged to its optical center. */
+	content: "\00d7";
+	font-size: 1.2vw;
+	transform: translateY(0.02vw);
+}
+.card-description > .card-description-close:hover {
+	background-color: rgba(35,30,15,.9);
+	color: #ffd700;
+	box-shadow: 0 0 .6vw goldenrod;
+}
+
+/* ------- carousel ------------- */
+
+#carousel {
+	position:absolute;
+	width: 100%;
+	height: calc(100vw * 1080 / 1920);
+	z-index:90;
+}
+
+/*
+#carousel > :nth-child(1) {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 1px solid blue;
+	z-index: -1;
+	background-image: url('img/icons/blank.png');
+	background-size: cover;
+}
+*/
+
+#carousel > :nth-child(1) {
+	wdith:100%;
+	heigth:100%;
+	
+	padding: 11.5% 10%;
+	
+	display:flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	
+	--carousel-trans-time: 0s;
+	--magnitude: 0;
+	translate: calc(var(--magnitude) * 1vw);
+	transition: translate calc(var(--carousel-trans-time) - 0.1s);
+	transition-timing-function: ease-in;
+}
+
+#carousel > :nth-child(1) > :not(:nth-child(3)):hover {
+	box-shadow: 0 0 1vw goldenrod;
+}
+
+#carousel > :nth-child(1) > .card-lg {
+	translate: calc(var(--magnitude) * 1vw);
+	transition: translate var(--carousel-trans-time), box-shadow 0.1s;
+	transition-timing-function: ease-in;
+}
+
+/*  middle  (3)  */
+#carousel > :nth-child(1) > :nth-child(3){
+	border: .3vw solid goldenrod;
+	box-shadow: 0 0 4vw goldenrod;
+	background-origin: border-box;
+	transition: box-shadow 0.1s, translate calc(var(--carousel-trans-time) - 0.05s);
+}
+#carousel > :nth-child(1) > :nth-child(3):hover {
+	box-shadow: 0 0 2vw goldenrod;
+}
+
+/*  adjacent (2, 4)  */
+#carousel > :nth-child(1) > :nth-child(2n) {
+	width: 13.75vw;
+	height: 25.9vw;
+	transition: box-shadow 0.1s, translate calc(var(--carousel-trans-time) + 0.05s);
+}
+
+/* outer most (1, 5) */
+#carousel > :nth-child(1) > :nth-child(4n - 3) {
+	width: 11.3vw;
+	height: 21.3vw;
+	transition: box-shadow 0.1s, translate calc(var(--carousel-trans-time) + .2s);
+}
+
+#carousel > :nth-child(1) > :nth-child(1) {
+	margin-left: 5%
+}
+
+#carousel > :nth-child(1) > :nth-child(5) {
+	margin-right: 5%;
+}
+
+#carousel .card-lg {
+	display:inline-block;
+	background-size:cover;
+	background-position: center;
+}
+
+#carousel .card-description {
+	left: 35.35%;
+	top: 77%;
+}
+
+#carousel > :nth-child(3) {
+	position: absolute;
+    width: 100%;
+    height: 7.5%;
+    top: 12%;
+    font-size: 1.75vw;
+    line-height: 250%;
+    background-color: rgba(10,10,10,.95);
+    text-align: center;
+    box-shadow: 0 0 1vw #ffffff54;
+}
+
+/* ---- carousel navigation arrows (all carousels) ---- */
+.carousel-arrow {
+	position: absolute;
+	top: 44%;
+	transform: translateY(-50%);
+	z-index: 95;
+	width: 4vw;
+	height: 4vw;
+	padding: 0 0 0.4vw 0;
+	border: 0.12vw solid goldenrod;
+	border-radius: 50%;
+	background-color: rgba(10,10,10,.55);
+	color: goldenrod;
+	font-family: serif;
+	font-size: 3vw;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 1vw rgba(0,0,0,.6);
+	transition: background-color .15s, box-shadow .15s, color .15s, opacity .2s, transform .1s;
+}
+.carousel-arrow:hover {
+	background-color: rgba(35,30,15,.9);
+	box-shadow: 0 0 1.4vw goldenrod;
+	color: #ffd700;
+}
+.carousel-arrow:active {
+	transform: translateY(-50%) scale(.9);
+}
+.carousel-arrow-left  { left: 2%; }
+.carousel-arrow-right { right: 2%; }
+.carousel-arrow.disabled {
+	opacity: .2;
+	pointer-events: none;
+}
+
+/* ---- redraw progress pips (sit above the title text) ---- */
+#carousel-progress {
+	position: absolute;
+	top: 6%;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 95;
+	display: flex;
+	gap: 1vw;
+	padding: .7vw 1.2vw;
+	border-radius: 2vw;
+	background-color: rgba(10,10,10,.7);
+	box-shadow: 0 0 1vw rgba(0,0,0,.5);
+}
+#carousel-progress.hide { display: none; }
+#carousel-progress > div {
+	width: 1vw;
+	height: 1vw;
+	border-radius: 50%;
+	border: 0.12vw solid goldenrod;
+	background-color: rgba(255,255,255,.12);
+	box-shadow: 0 0 .4vw rgba(0,0,0,.6);
+	transition: background-color .25s, box-shadow .25s, transform .25s;
+}
+#carousel-progress > div.used {
+	background-color: goldenrod;
+	box-shadow: 0 0 .8vw goldenrod;
+	transform: scale(1.15);
+}
+
+/* ---- discard fly-away ghost ---- */
+.carousel-discard {
+	position: fixed;
+	z-index: 130;
+	background-size: cover;
+	background-position: center;
+	border: .3vw solid goldenrod;
+	border-radius: 1.5vw;
+	box-shadow: 0 0 4vw goldenrod;
+	background-origin: border-box;
+	pointer-events: none;
+	opacity: 1;
+	transform: translate(0,0) scale(1) rotate(0deg);
+	transition: transform .6s cubic-bezier(.55,-0.2,.6,1),
+				opacity .35s ease-in .3s,
+				filter .5s ease-in .15s;
+}
+.carousel-discard.go {
+	transform: translateY(9vh) scale(.5) rotate(-10deg);
+	opacity: 0;
+	filter: grayscale(.8) brightness(.5);
+}
+.carousel-discard-symbol {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 45%;
+	height: 45%;
+	background: url('svg/trash.svg') center/contain no-repeat;
+	filter: drop-shadow(0 0 .6vw #000);
+	opacity: 0;
+	transform: translate(-50%,-50%) scale(.4);
+	transition: opacity .25s ease-out .05s,
+				transform .35s cubic-bezier(.2,1.4,.4,1) .05s;
+}
+.carousel-discard.go .carousel-discard-symbol {
+	opacity: 1;
+	transform: translate(-50%,-50%) scale(1);
+}
+
+/* ---- freshly drawn / restored card pop-in ---- */
+@keyframes carousel-draw-in {
+	0%   { opacity: 0; transform: scale(.78); }
+	60%  { opacity: 1; }
+	100% { opacity: 1; transform: scale(1); }
+}
+#carousel .card-lg.carousel-drawn {
+	animation: carousel-draw-in .42s cubic-bezier(.2,.9,.3,1.1);
+}
+
+/* --------------------- popup ---------------------------  */
+
+#popup {
+	position: absolute;
+    width: 100%;
+    height: calc(100vw * 1080 / 1920);
+    background-color: rgba(10,10,10,.95);
+    z-index: 1000;
+    /* background-image: url(img/boardtest10.png); */
+    /* background-size: contain; */
+}
+
+
+#popup > div {
+    margin-top: -89px;
+    width: 26.5%;
+    border: .2vw solid rgb(60,60,60);
+    padding: 0 0.5vw;
+    background-color: rgb(20,20,20);
+}
+
+#popup h3 {
+    display: block;
+    font-size: 1.05vw;
+    text-transform: uppercase;
+    color: grey;
+    text-align: center;
+    line-height: 100%;
+}
+
+#popup p {
+    text-align: center;
+    font-size: 1.23vw;
+    padding-top: .6vw;
+    color: tan;
+}
+
+#popup > div > div {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .2vw;
+    min-width: 10%;
+    width: fit-content;
+    margin: -1.4vw auto 0;
+    border: .2vw solid rgb(25,25,25);
+    background-color: black;
+    top: 1.3vw;
+}
+
+#popup button {
+
+    display: inline-block;
+    width: auto;
+    height: 1.8vw;
+    border: .2vw solid rgb(40,40,40);
+    background-color: rgb(20,20,20);
+    font-size: 1vw;
+    text-shadow: 1vw 1vw 1vw black;
+	text-transform: capitalize;
+	margin: 0 0.3vw;
+	transition: color 0.1s, border-color 0.1s;
+}
+#popup button:hover {
+	box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+	border-color: rgb(70, 70, 70);
+}
+
+#popup button:first-child { color: green; }
+#popup button:first-child:hover { color: lightgreen; }
+#popup button:last-child {color: darkred; }
+#popup button:last-child:hover {color: red; }
+#popup button.hide { display: none; }
+
+/* --------------------- end screen ---------------------------  */
+
+#end-screen {
+	width: 100%;
+	height: calc(100vw * 1080 / 1920);
+	position: absolute;
+	z-index: 1000;
+	background-color: rgba(10,10,10,0.95);
+}
+
+#end-screen * {
+	position: relative;
+}
+
+#end-screen > :nth-child(1)  {
+	top:12.6%;
+	left:32.9%;
+	width: calc(100% * 656 / 1920 );
+	height: calc(100% * 416 / 1080 );
+	margin-bottom: -21.65%;
+	background-size: contain;
+}
+.end-draw { background-image: url('img/icons/end_draw.png'); }
+.end-win  { background-image: url('img/icons/end_win.png');  }
+.end-lose { background-image: url('img/icons/end_lose.png'); }
+
+#end-screen > table {
+	top: 55%;
+	left: 7.6%;
+	width: 74%;
+	height: 22%;
+	margin-bottom: -12.3%;
+	table-layout: fixed;
+}
+
+#end-screen tbody :first-child th {
+	font-size: .9vw;
+	text-align: center;
+	color: darkslategrey;
+	color: rgb(100,100,100);
+}
+
+#end-screen td {
+	font-size: 1.7vw;
+	text-align: center;
+	color: rgb(180,180,180);
+}
+
+#end-screen tr :first-child {
+	font-size: 1.2vw;
+	text-align: right;
+	color:darkorange;
+	padding-right: 5%;
+}
+
+#end-screen > p {
+	top: 80%;
+	left: 30.1%;
+	width: 41%;
+	height: 3%;
+	font-size: 1.21vw;
+	color: rgb(180,180,180);
+}
+
+#end-screen .end-actions {
+    position: absolute;
+    top: 80%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.6vw;
+}
+
+/* Modern, minimal action buttons matching the main-menu "Play Now" style */
+#end-screen .end-actions button {
+    position: static;
+    min-width: 9vw;
+    padding: .7vw 1.8vw;
+    background: transparent;
+    border: 1px solid rgba(255,200,80,0.25);
+    border-radius: 2px;
+    font-family: sans-serif;
+    font-size: .8vw;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,210,120,0.7);
+    box-shadow: none;
+    transition: border-color .35s ease, color .35s ease, background-color .35s ease, box-shadow .35s ease;
+}
+
+#end-screen .end-actions button:hover {
+    border-color: rgba(255,200,80,0.55);
+    color: rgba(255,215,130,1);
+    box-shadow: 0 0 1.6vw rgba(255,160,40,0.15);
+}
+
+#end-screen .end-action-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+/* This id+class rule would otherwise outrank the generic `.hide`, leaving the
+   online-only Play Again stack visible in single player. */
+#end-screen .end-action-stack.hide { display: none; }
+
+#end-screen #rematch-status {
+    max-width: 11vw;
+    font-size: 0.8vw;
+    line-height: 1.35;
+    text-align: center;
+    color: rgba(255,210,120,0.55);
+    letter-spacing: 0.07em;
+}
+
+#end-screen #rematch-status span { display: block; }
+
+/* Opponent has asked for a rematch: nudge attention to the still-unfilled button */
+#end-screen .end-actions .rematch-wanted {
+    border-color: rgba(255,200,80,0.7);
+    color: rgba(255,225,150,1);
+    box-shadow: 0 0 1.4vw rgba(255,160,40,0.25);
+}
+
+/* You readied up: filled so it clearly reads as "active / locked in" */
+#end-screen .end-actions .rematch-waiting,
+#end-screen .end-actions .rematch-waiting:hover {
+    background: rgba(255,180,60,0.92);
+    border-color: rgba(255,215,140,0.95);
+    color: #1a1206;
+    box-shadow: 0 0 1.8vw rgba(255,160,40,0.4);
+}
+
+/* --------------------- panels ---------------------------  */
+
+.panel {
+	display:inline-block;
+	height: 100%;
+	box-sizing: border-box;
+	overflow-y: hidden;
+	overflow-x: visible;
+	
+	/*new values*/
+	overflow-y: visible;
+	position:absolute;
+	height: calc(100vw * 1080 / 1920);
+}
+
+.panel div, .panel section, .panel span{
+	position: relative;
+}
+
+/*
+.panel div, .panel section, .panel span{
+	border: 1px solid yellow;
+	background-color: rgba(0, 100, 100, 0.2);
+	box-sizing: border-box;
+	background-origin: border-box;
+}
+*/
+
+/*
+main { background-image: url('img/boardtest8.png'); }
+*/
+
+/*
+#panel-left { border: 1px solid blue;	background-color: rgba(0,0,100,.2); }
+#panel-mid { border: 1px solid green; background-color: rgba(0, 100, 0, 0.2); }
+#panel-right { border: 1px solid red; background-color: rgba(100, 0, 0, 0.2); }
+*/
+
+#panel-left {
+	width: 26.5%;
+}
+
+#panel-mid {
+	width:52.5%;
+	left: 26.5%;
+}
+
+#panel-right {
+	width: 21%;
+	left: 79%;
+}
+
+/* -------------------- left panel ----------------------- */
+
+#weather {
+	top: 41.25%; 
+	left: 27.9%;
+	width: 54.9%;
+	height: 12.75%;
+	margin-bottom: -27%;
+	z-index: 1;
+}
+
+.leader-box {
+	left: 27.5%;
+	width: 31.4%;
+	height: 12.5%;
+	margin-bottom: -26.25%;
+}
+
+.leader-box .card {
+	pointer-events: none;
+}
+
+.leader-box > .leader-container {
+	height: 100%;
+	width: 63%;
+	margin-bottom: -80%;
+	
+	/* replace it html with center class */
+	display:flex;
+	flex-items:center;
+	justify-content:center;
+}
+
+.leader-box > .leader-container:hover {
+	box-shadow: 0 0 1vw goldenrod;
+	box-sizing: border-box;
+}
+
+.leader-box > div > .card {
+	position:absolute;
+	height: 98%;
+	width: 95%;
+	border-radius: 0.6vw;
+}
+
+.leader-active {
+	top: 33%;
+	left: 75%;
+	height: 28%;
+	width: 24%;
+}
+
+.leader-active > div {
+	background-image: url('img/icons/icon_leader_active.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 100%;
+}
+
+#leader-op {
+	top: 7.55%;
+}
+#leader-op .leader-container::after {
+	left: unset;
+	bottom: -2.2vw;;
+}
+
+#leader-me {
+	top: 77.5%;
+}
+#leader-me .leader-container::after {
+	left: unset;
+	bottom: -2.2vw;;
+}
+
+.stats {
+	height: 12.5%;
+	width: 88.5%;
+	margin-bottom: -27%;
+	background-color: rgba(20,20,20,0.6);
+}
+
+.current-turn {
+	box-shadow: 0 0 1vw 0.15vw goldenrod;
+}
+
+#stats-op {
+	top: 24.25%;
+}
+
+#stats-me {
+	top: 61.75%;
+}
+
+.profile-img {
+	left: 28.4%;
+	top: 9.6%;
+	width: 21.9%;
+	height: 80%;
+	margin-bottom: -24%;
+	
+	background-image: url('img/icons/profile.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	border-radius: 100%;
+	/*background-overflow: hidden;*/
+}
+
+.profile-img > div {
+	left: -10%;
+	top: -6%;
+	height: 118%;
+	width: 118%;
+	background-image: url('img/icons/icon_player_border.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	overflow: visible;
+}
+
+.profile-img > div > div {
+	width: 43%;
+	height: 43%;
+	left: -10.5%;
+	top: .5%;
+	
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+#stats-me > div > div > div {
+	top: 59%;
+}
+
+.score-total {
+	top: 25%;
+	left: 94.5%;
+	height: 40%;
+	width: 12%;
+	
+	top:31%;
+	
+	margin-bottom: -12%;
+	
+	color: black;
+	text-shadow: 0 0 5px white;
+	font-size: 2.3vw;
+	font-weight: bold;
+	
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+#score-total-me {
+	background-image: url('img/icons/score_total_me.png');
+}
+
+#score-total-op {
+	background-image: url('img/icons/score_total_op.png');
+}
+
+.score-leader > div{
+	background-image: url('img/icons/icon_high_score.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: bottom;
+	left:-46%;
+	top: -32%;
+	width:195%;
+	height: 170%;
+}
+
+
+.hand-count {
+	top: 58.5%;
+	left: 53.25%;
+	height: 29.5%;
+	width: 17%;
+	margin-bottom: -9%;
+
+	font-size: 1.7vw;
+	font-weight: bold;
+	padding-left: 7%;
+	
+	
+	
+	background-image: url('img/icons/icon_card_count.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: left;
+	
+	
+}
+
+#hand-count-me {
+	top:18.5%;
+}
+
+.gem {
+	width: 9%;
+	height:31%;
+	margin-bottom: -9.25%;
+	background-image: url('img/icons/icon_gem_off.png');
+}
+
+.gem-on {
+	background-image: url('img/icons/icon_gem_on.png');
+}
+
+#gem2-op {
+	top: 56.25%;
+	left: 70.75%;
+}
+
+#gem1-op{
+	top:56%;
+	left:80%;
+}
+
+#gem2-me {
+	top: 14.5%;
+	left: 70.75%;
+}
+
+#gem1-me{
+	top: 14.5%;
+	left: 80%;
+}
+
+.name {
+	left: 53%;
+	top: 6%;
+	width:41.5%;
+	height: 20%;
+	margin-bottom: -6%;
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 1.1vw;
+	font-weight: bold;
+	
+	/*font-family: Arial Narrow, sans-serif;*/
+}
+
+#name-me {
+	top: 60%;
+}
+
+.deck-name {
+	left: 53%;
+	top: 25%;
+	width: 41.5%;
+	height: 20%;
+	margin-bottom: -6%;
+	overflow: hidden;
+	text-transform:capitalize;
+	
+	color: tan;
+	font-size: .95vw;
+	/*font-family: Arial Narrow, sans-serif;*/
+}
+
+#deck-name-me {
+	top:80%;
+}
+
+.passed {
+	height: 0%;
+	width: 0%;
+	left:90%;
+	top: 87%;
+	
+	color: tan;
+	font-size: 1.5vw;
+	font-weight: bold;
+	text-shadow: 1px 1px 2px black;
+}
+#passed-me{ top: -3%;}
+
+#pass-button {
+	top: 82%;
+	left: 63%;
+	width:20%;
+	height: 4%;
+	
+	font-size: 2vw;
+	font-weight: bold;
+	
+	border: .1vw solid goldenrod;
+	border-radius: .5vw;
+	background-color: rgba(20,20,20,.9);
+}
+#pass-button:hover {
+	text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.5);
+}
+
+/* ------------- middle pannel ------------------ */
+
+.field {
+	width: 100%;
+	height: 38.5%;
+}
+
+.field .hero {
+	pointer-events: none;
+}
+
+#field-op {
+	top:-1.1%;
+}
+
+#field-op .card {
+	pointer-events: none;
+}
+
+#field-me {
+	top: -1.0%;
+}
+
+#field-hand {
+	width: 100%;
+	height:13%;
+}
+
+.field-row {
+	height: 32%;
+	top: 4%;
+	display:flex;
+	z-index: 1;
+}
+
+.field-row > div {
+	position: absolute;
+}
+
+.row-score {
+	width: 5.1%;
+	top:7%;
+	height: 95%;
+	margin-bottom: -12.65%;
+	font-size: 1.8vw;
+	
+	color: black;
+	text-shadow: 0 0 5px white;
+}
+
+.row-special {
+	width: 14.25%;
+	height: 100%;
+	left: 5.1%;
+	margin-bottom: -12.65%;
+}
+
+.row-cards {
+	height: 100%;
+	width: 80.65%;
+	left: 19.35%;
+
+	left: 20%;
+	width: 79.7%;
+}
+
+.row-weather {
+	position: absolute;
+	top: 5%;
+	left: 5.75%;
+	width: 94.25%;
+	height: 100%;
+	
+	pointer-events : none;
+	
+	background-size: cover;
+	background-position: bottom;
+	background-repeat: no-repeat;
+	opacity: 0;
+}
+.frost { background-image: url('img/icons/overlay_frost.png'); }
+.rain  { background-image: url('img/icons/overlay_rain.png');  }
+.fog   { background-image: url('img/icons/overlay_fog.png');   }
+
+#hand-row {
+	top: 8%;
+	height:91%;
+	left: 7.1%;
+	width: 92.5%;
+	z-index: 1;
+}
+
+.row-selectable {
+	background-color: rgba(255,255,0, 0.08);
+}
+
+/* The hover highlight is unified with the keyboard cursor: hovering a card /
+   row sets .kb-focus (see KeyboardControls.onHoverIn), so the visual lives in
+   one place and the two inputs can never stack or leave a stuck highlight.
+   These rules keep only the name tooltip, shown on mouse hover OR when the
+   keyboard cursor focuses the card, so both inputs reveal the card's name. */
+.card-selectable > .card:hover::after,
+.card-selectable > .card.kb-focus::after
+{
+	pointer-events: all;
+	bottom: -1.9vw;
+}
+
+/*
+#hand-row > .card {
+	position: relative;
+	position: absolute;
+	
+	height: 100%;
+	width: 9.35%;
+}
+*/
+
+/* ---------------- right panel ------------- */
+
+.cardpile {
+	width: 27.6%;
+	height: 13.5%;
+	margin-bottom: -36.25%;
+	
+	display:flex;
+	flex-direction:column-reverse;
+	align-items: center;
+	overflow: visible;
+	z-index: 1;
+}
+
+.cardpile .card {
+	pointer-events: none;
+}
+
+#grave-op, #grave-me {
+	z-index: 2;
+}
+
+#grave-op {
+	top: 6.5%;
+	left: 6.5%;
+}
+
+#deck-op {
+	top: 6.5%;
+	left: 51%
+}
+
+#grave-me {
+	top: 76.5%;
+	left: 6.5%;
+}
+
+#deck-me {
+	top: 76.5%;
+	left: 51%
+}
+
+.grave:not(:empty):hover {
+	box-shadow: 0 0 .75vw goldenrod;
+	box-sizing: border-box;
+}
+.grave:not(:empty)::after{
+	left: -0.4vw;
+}
+.grave:empty::after {
+	visibility: hidden;
+}
+
+.deck-card {
+	position: relative;
+	display: inline-block;
+	
+	height: 6.675vw;
+	width: 4.45vw;
+
+	background-size:contain;
+	background-repeat: no-repeat;
+	box-shadow: -.1vw -.1vw .5vw rgba(20,20,20, 0.5);
+}
+
+.deck-counter {
+	position: relative;
+	background-color: rgba(20,20,20, 0.8);
+	
+	width: 3vw;
+	height: 2vw;
+	
+	z-index: 1;
+	
+	color:tan;
+	font-size: 1.3vw;
+}
+
+.cardpile .deck-card {
+	top: -5%;
+	margin-top: -114.5%;
+}
+
+
+.cardpile > .card {
+	/* position: relative; */
+	top: -5%;
+	margin-top: -108.5%;
+}
+
+/* ----------- deck creation menu  ------------------*/
+
+#deck-customization {
+	position: absolute;
+	width: 100%;
+	height: calc(100vw * 1080 / 1920);
+	background-color: rgba(10,10,10,.95);
+	z-index: 85;
+}
+
+#faction-title {
+	position: absolute;
+	height: 5%;
+	width: 100%;
+	top: 6%;
+}
+
+#deck-customization h1 {
+    position: absolute;
+    font-size: 1.45vw;
+    color: #dedede;
+    line-height: 220%;
+    text-transform: capitalize;
+    padding: 0 3%;
+	
+
+	
+	top: -60%;
+	
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#faction-description {
+	position: absolute;
+	font-size: 1.14vw;
+	color: #ab977c;
+	top: 9.45%;
+	left: 20.2%;
+	width: 60%;
+	text-align: center;
+}
+
+/* Flex row with a gap so longer translations don't overlap. */
+.deck-actions-row {
+	position: absolute;
+	top: 15%;
+	left: 40%;
+	display: flex;
+	align-items: baseline;
+	gap: 2vw;
+}
+
+.deck-options{
+	font-size: 1vw;
+	color: white;
+	white-space: nowrap;
+}
+.deck-options:hover {
+	text-decoration: underline;
+}
+
+#lobby-return {
+	position: absolute;
+	top: 1vw;
+	left: 1vw;
+	font-size: 1vw;
+	color: white;
+	z-index: 90;
+	display: flex;
+	align-items: center;
+	gap: 0.4vw;
+}
+#lobby-return::before {
+	content: "";
+	display: inline-block;
+	width: 0.85vw;
+	height: 0.85vw;
+	background-image: url("svg/exit.svg");
+	background-size: contain;
+	background-repeat: no-repeat;
+	opacity: 0.6;
+	filter: brightness(0) invert(1);
+}
+#lobby-return:hover {
+	text-decoration: underline;
+}
+#lobby-return:hover::before {
+	opacity: 1;
+}
+
+#fullscreen-toggle {
+	position: absolute;
+	top: 1vw;
+	right: 1vw;
+	font-size: 1vw;
+	color: white;
+	z-index: 90;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.4vw;
+}
+#fullscreen-toggle::before {
+	content: "";
+	display: inline-block;
+	width: 0.85vw;
+	height: 0.85vw;
+	background-image: url("svg/fullscreen.svg");
+	background-size: contain;
+	background-repeat: no-repeat;
+	opacity: 0.6;
+	filter: brightness(0) invert(1);
+}
+#fullscreen-toggle:hover {
+	text-decoration: underline;
+}
+#fullscreen-toggle:hover::before {
+	opacity: 1;
+}
+
+.card-array {
+	position: absolute;
+	width: 34.4%;
+	height: 68%;
+	overflow-y: scroll;
+	padding: .1vw 1.1vw;
+	display: flex;
+	flex-wrap:wrap;
+	justify-content: space-between;
+}
+
+.card-array .card-lg:hover {
+	box-shadow: 0 0 1vw goldenrod;
+}
+
+.card-array .card-lg.empty
+{
+	visibility: hidden;
+}
+
+#card-bank {
+	top: 22.5%;
+	left: 8.275%;
+}
+
+#card-deck {
+	top: 22.5%;
+	left: 58.4%;
+}
+
+.card-array .card-lg {
+    width: 9.88vw;
+    height: 18.45vw;
+    border-radius: 1vw;
+	margin-bottom: 0.75vw;
+}
+
+.card-array .card-lg > div {
+	position: relative;
+	top: 82.5%;
+	left: 76%;
+	width: 20%;
+	height: 7%;
+	font-size: 1.2vw;
+	color: #5f4923;
+	padding-left: 1.7vw;
+	background-image: url('img/icons/preview_count.png');
+	background-position: left;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+#card-leader {
+	position: absolute;
+	height: 27%;
+	width: 6.9%;
+	top: 20.8%;
+	left: 46.6%;
+}
+
+#card-leader p {
+	font-size: 1.1vw;
+	text-align: center;
+	color: #8f6c36;
+	line-height: 0%;
+	margin: 9%;
+}
+
+#card-leader > div {
+	position: relative;
+	height: 84.5%;
+	margin-top: 24.5%;
+	
+	background-size: contain;
+	border-radius: .5vw;
+}
+#card-leader > div:hover {
+	box-shadow: 0 0 .75vw goldenrod;
+}
+
+#deck-stats {
+	position: absolute;
+	width: 12%;
+	height: 30%;
+	top: 49.5%;
+	left: 44.05%;
+}
+
+#deck-stats > p:nth-child(odd) {
+	color: #82735f;
+	font-size: 1.05vw;
+	text-align: center;
+	margin-bottom: -6.75%;
+}
+
+#deck-stats > p:nth-child(even) {
+	font-size: 1.2vw;
+	text-align: left;
+	color: #9f7d3e;
+	padding-left: 2.3vw;
+	margin-left: 3.95vw;
+	margin-bottom: -6.75%;
+	
+	background-repeat: no-repeat;
+	background-position: left;
+	background-size: 2.5vw;
+}
+
+#deck-stats > p:nth-child(2) { background-image: url('img/icons/deck_stats_count.png'); }
+#deck-stats > p:nth-child(4) { background-image: url('img/icons/deck_stats_unit.png'); }
+#deck-stats > p:nth-child(6) { background-image: url('img/icons/deck_stats_special.png'); }
+#deck-stats > p:nth-child(8) { background-image: url('img/icons/deck_stats_strength.png'); }
+#deck-stats > p:nth-child(10) { background-image: url('img/icons/deck_stats_hero.png'); }
+
+#start-game {
+	position: absolute;
+	top: 86%;
+	left: 50%;
+	transform: translateX(-50%);
+	min-width: 6%;
+	padding: 0 0.6%;
+	height: 3%;
+	font-size: 0.98vw;
+	white-space: nowrap;
+	text-align: center;
+	color: white;
+	background-color: rgb(20,20,20);
+	border: 0.1vw ridge rgb(30,30,30);
+}
+#start-game:hover {
+	box-shadow: 0 0 0.75vw white;
+}
+
+#opponent-preview {
+    position: absolute;
+    top: 50.9vw;
+	width: 100%;
+    left: -0.3vw;
+    justify-content: center;
+    align-items: center;
+	flex-direction: column;
+}
+#opponent-preview>div>p {
+	color: #82735f;
+	font-size: 1.05vw;
+	text-align: center;
+	margin-bottom: 2.5%;
+	margin-top: 0;
+}
+#opponent-preview>div {
+}
+#op-preview-faction {
+	background-size: contain;
+    background-repeat: no-repeat;
+	height: 2vw;
+	width: 	2vw;
+}
+#op-preview-faction {
+	/* visibility: hidden; */
+}
+#op-preview-leader::after {
+	left: 46vw;
+	bottom: -1.5vw;
+}
+#op-preview-leader>p {
+	font-size: 1vw;
+	color:white;
+	margin: 0.2vw;
+}
+#op-preview-leader:hover {
+	text-decoration: underline;
+	text-decoration-color: white;
+}
+#opponent-preview button {
+	background-color: transparent;
+	border: none;
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 1.8vw;
+	height: 1.9vw;
+}
+#op-preview-open {
+	background-image: url("svg/view.svg");	
+    width: 1.5vw !important;
+    height: 1.5vw !important;
+}
+#op-preview-open:hover {
+	filter: drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.5));
+}
+#op-preview-open::after {
+	left: -2.9vw;
+}
+#op-preview-clear {
+	background-image: url("svg/trash.svg");
+}
+#op-preview-clear:hover {
+	filter: drop-shadow(0 0 3px red);
+}
+#op-preview-clear::after {
+	left: -2.9vw;
+}
+
+.card-contianer-title {
+	position: absolute;
+	width: 10%;
+	height: 3%;
+	font-size: 1.3vw;
+	color: #959595;
+}
+
+#card-bank-title {
+	top: 7.45%;
+	left: 8.5%;
+}
+
+#card-deck-title {
+	top: 7.8%;
+	left: 84.45%;
+}
+
+/* ----------- cards ------------------*/
+
+.card {
+	/*height: 100%;
+	width: auto;*/
+	/*width: calc(100% * 775 / 410);*/
+	
+	height: 6.35vw;
+	width: 4.45vw;
+	
+	background-size:contain;
+	background-repeat: no-repeat;
+	
+	box-shadow: -.1vw -.1vw .5vw rgba(20,20,20, 0.5);
+	
+	display: inline-block;
+	
+	/*position: absolute;*/
+	position: relative;
+	
+	transition: margin-bottom 0.05s, margin-left .25s, margin-right .25s, transform 0.5s;
+	
+	z-index = 1;
+}
+
+.deck-card .card { position : absolute; }
+
+.card > div {
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.card > div:nth-child(1) {
+	top: -4%;
+	left: -4%;
+	width: 70%;
+	height: 50%;
+	margin-bottom: -71%;
+	
+	background-position: 0 0;
+	
+}
+
+.card > div:nth-child(1) > div {
+	top: 13%;
+	left: 7%;
+	width: 50%;
+	heighth:  50%;
+	font-size: 1vw;
+	font-weight: bold;
+	color: black;
+	text-shadow: 0 0 .1vw white;
+}
+
+.hero > div:nth-child(1) > div {
+	color: white;
+	text-shadow: 0 0 .1vw black;
+}
+
+
+
+.card > div:nth-child(2) {
+	top: 75%;
+	left: 65%;
+	width: 33%;
+	height: 22%;
+	margin-bottom: -32%;
+	/*border: 1px solid blue;*/
+}
+
+.card > div:nth-child(3){
+	top: 75%;
+	left: 31%;
+	width: 33%;
+	height: 22%;
+	margin-bottom: -32%;
+	
+	font-size: 1vw;
+	/*border: 1px solid red;*/
+}
+
+.card > div:nth-child(4) {
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-size: 40% auto;
+	opacity: 0;
+	filter: alpha(opacity=0);
+	transition: background-size 0.25s;
+}
+
+.card-container {
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+}
+
+.card-container .card {
+	margin: 0 1px;
+	flex-shrink: 0;
+	/*margin: 0 -10px;*/
+	/*margin: 0 calc((100% - (4.45vw * 14)) / 26);*/
+}
+
+/* ---------- tooltip -------------  */
+
+/* Hover tooltips only show on real hover devices; touch has no hover-out
+   to close them. */
+@media (hover: hover) and (pointer: fine) {
+	*[data-title]:hover::after {
+		content: attr(data-title);
+		background-color: rgba(10,10,10,.95);
+		color: goldenrod;
+		font-family: Arial Narrow, sans-serif;
+		font-size: 1.2vw;
+		position: absolute;
+		padding: 1px 5px 2px 5px;
+		bottom: -2vw;
+		left: var(--title-left);
+		white-space: nowrap;
+		box-shadow: 1px 1px 4px #242424;
+		text-shadow: none;
+		border: 1px solid #1b1b1b;
+		z-index: 9999999;
+		pointer-events: none;
+	}
+
+	.lobby-menu[data-title]:hover::after,
+	.deck-menu[data-title]:hover::after {
+		bottom: 3vw;
+	}
+
+	#toggle-feedback.lobby-menu[data-title]:hover::after,
+	#toggle-feedback.deck-menu[data-title]:hover::after {
+		left: auto;
+		right: 0;
+	}
+
+	#lobby-fullscreen-toggle[data-title]:hover::after,
+	#match-fullscreen-toggle[data-title]:hover::after {
+		left: auto;
+		right: 0;
+	}
+}
+
+[data-title].kb-focus::after {
+	content: attr(data-title);
+	background-color: rgba(10,10,10,.95);
+	color: goldenrod;
+	font-family: Arial Narrow, sans-serif;
+	font-size: 1.2vw;
+	position: absolute;
+	padding: 1px 5px 2px 5px;
+	bottom: -2vw;
+	left: var(--title-left);
+	white-space: nowrap;
+	box-shadow: 1px 1px 4px #242424;
+	text-shadow: none;
+	border: 1px solid #1b1b1b;
+	z-index: 9999999;
+	pointer-events: none;
+}
+
+
+/* ----------- misc ----------------  */
+
+.center {
+	display: flex;
+	justify-content: center;
+	align-items:center;
+}
+
+.bg-contain{
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+.visible { display: visible; }
+.hide {display: none; }
+.fade:not(.settings-button) {opacity: 0.2; filter: alpha(opacity=20); }
+
+.noclick {
+	pointer-events: none;
+}
+
+/* --------------------- multiplayer lobby ---------------------  */
+
+#lobby {
+	position: absolute;
+	width: 100%;
+	height: calc(100vw * 1080 / 1920);
+	background-color: rgb(10,10,10);
+	z-index: 90;
+	color: rgb(180,180,180);
+	text-align: center;
+}
+
+#lobby-title {
+	margin-top: 9vw;
+	font-size: 3.4vw;
+	font-weight: normal;
+	letter-spacing: .4vw;
+	text-transform: uppercase;
+	color: goldenrod;
+	text-shadow: 0 0 1.5vw #6d5210;
+}
+
+.lobby-view {
+	margin-top: 2.5vw;
+}
+
+/* ---------- multiplayer sub-screen typography ---------- */
+
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	20%       { transform: translateX(-6px); }
+	40%       { transform: translateX(6px); }
+	60%       { transform: translateX(-4px); }
+	80%       { transform: translateX(4px); }
+}
+
+.shake {
+	animation: shake 0.35s ease;
+}
+
+.mp-subtitle {
+	font-family: sans-serif;
+	font-size: 13px;
+	letter-spacing: 5px;
+	text-transform: uppercase;
+	color: rgba(255,210,140,0.7);
+	margin: 0 0 2.2vw;
+}
+
+/* ---------- lobby-mp option tiles ---------- */
+
+.mp-options {
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	margin: 0 auto;
+	width: 56vw;
+}
+
+.mp-option {
+	flex: 1;
+	padding: 1.8vw 1.5vw 1.6vw;
+	background: rgba(255,160,40,0.04);
+	border: 1px solid rgba(255,200,80,0.35);
+	color: inherit;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.45vw;
+	transition: border-color .4s ease, background .4s ease, box-shadow .4s ease;
+}
+
+.mp-option:hover {
+	border-color: rgba(255,200,80,0.7);
+	background: rgba(255,160,40,0.1);
+	box-shadow: 0 0 2.5vw rgba(255,160,40,0.25);
+}
+
+.mp-option-tag {
+	display: block;
+	font-family: sans-serif;
+	font-size: 12px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: rgba(255,210,120,0.8);
+	transition: color .4s ease;
+}
+
+.mp-option:hover .mp-option-tag {
+	color: rgba(255,225,150,1);
+}
+
+.mp-option-heading {
+	display: block;
+	font-family: Georgia, serif;
+	font-weight: 400;
+	font-size: 1.35vw;
+	letter-spacing: 2px;
+	color: rgba(255,255,255,0.95);
+	transition: color .4s ease, text-shadow .4s ease;
+}
+
+.mp-option:hover .mp-option-heading {
+	color: #fff;
+	text-shadow: 0 0 1.5vw rgba(255,160,40,0.6), 0 0 3vw rgba(255,120,20,0.25);
+}
+
+.mp-option-desc {
+	display: block;
+	font-family: sans-serif;
+	font-size: 14px;
+	letter-spacing: 1px;
+	color: rgba(255,255,255,0.6);
+	transition: color .4s ease;
+}
+
+.mp-option:hover .mp-option-desc {
+	color: rgba(255,255,255,0.85);
+}
+
+.mp-options-divider {
+	width: 1px;
+	align-self: stretch;
+	margin: 0 2vw;
+	background: linear-gradient(to bottom, transparent 0%, rgba(255,200,80,0.3) 50%, transparent 100%);
+}
+
+/* ---------- back / cancel link ---------- */
+
+.mp-back {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6vw;
+	margin: 2vw auto 0;
+	padding: 0.8vw 1.5vw;
+	background: transparent;
+	border: none;
+	font-family: sans-serif;
+	font-size: 12px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: rgba(255,255,255,0.65);
+	transition: color .3s ease;
+}
+
+.mp-back-icon {
+	display: inline-block;
+	width: 0.75vw;
+	height: 0.75vw;
+	background-color: currentColor;
+	-webkit-mask-image: url("svg/exit.svg");
+	mask-image: url("svg/exit.svg");
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	flex-shrink: 0;
+}
+
+.mp-back:hover {
+	color: rgba(255,215,130,1);
+}
+
+/* ---------- lobby-create/join ---------- */
+
+#lobby-create .mp-back {
+	margin-top: 0.3vw;
+}
+
+.lobby-hint {
+	font-family: sans-serif;
+	font-size: 12px;
+	letter-spacing: 2px;
+	color: rgba(255,255,255,0.6);
+	margin: .5vw 0;
+	min-height: 1.1vw;
+}
+
+.lobby-hint-error {
+	letter-spacing: 1px;
+	color: rgba(192,57,43,0.85);
+}
+
+.lobby-status {
+	font-family: sans-serif;
+	font-size: 12px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: rgba(255,200,80,0.8);
+	margin: .6vw auto;
+	min-height: 1.2vw;
+	display: inline-block;
+	position: relative;
+}
+
+@keyframes waiting-dots {
+	0%   { content: ""; }
+	25%  { content: "."; }
+	50%  { content: ".."; }
+	75%  { content: "..."; }
+	100% { content: ""; }
+}
+
+.lobby-status.is-waiting::after {
+	content: "";
+	position: absolute;
+	left: 100%;
+	top: 0;
+	padding-left: 0.3em;
+	animation: waiting-dots 1.6s infinite;
+}
+
+#room-code {
+	display: inline-block;
+	margin: .5vw auto;
+	padding: .5vw 1.2vw .5vw 2vw;
+	font-size: 3.2vw;
+	letter-spacing: .8vw;
+	color: goldenrod;
+	background-color: transparent;
+	border: 1px solid rgba(255,200,80,0.45);
+	box-shadow: 0 0 1.5vw rgba(255,160,40,0.15);
+	transition: border-color .4s ease, box-shadow .4s ease;
+}
+
+#room-code:hover {
+	border-color: rgba(255,200,80,0.55);
+	box-shadow: 0 0 2.5vw rgba(255,160,40,0.25);
+}
+
+#join-code {
+	display: block;
+	margin: .6vw auto;
+	width: 12vw;
+	padding: .5vw 0 .5vw .8vw;
+	font-family: Arial Narrow;
+	font-size: 2.2vw;
+	letter-spacing: .8vw;
+	text-align: center;
+	text-transform: uppercase;
+	color: goldenrod;
+	background-color: transparent;
+	border: 1px solid rgba(255,200,80,0.4);
+	outline: none;
+	transition: border-color .3s ease, box-shadow .3s ease;
+}
+
+#join-code:focus {
+	border-color: rgba(255,200,80,0.5);
+	box-shadow: 0 0 1.5vw rgba(255,160,40,0.15);
+}
+
+.mp-action-button {
+	display: block;
+	margin: 1.2vw auto 0;
+	padding: .6vw 2.5vw;
+	background: transparent;
+	border: 1px solid rgba(255,200,80,0.45);
+	font-family: sans-serif;
+	font-size: 12px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: rgba(255,215,130,0.95);
+	transition: border-color .4s ease, color .4s ease, box-shadow .4s ease;
+}
+
+.mp-action-button:hover {
+	border-color: rgba(255,200,80,0.8);
+	color: rgba(255,225,150,1);
+	box-shadow: 0 0 2.5vw rgba(255,160,40,0.3);
+}
+
+/* ----- main menu: split-screen hover reveal ----- */
+
+#lobby-mode.lobby-split:not(.hide) {
+	/* Always fills the true viewport, independent of the 16:9 canvas. */
+	position: fixed;
+	inset: 0;
+	margin: 0;
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	background-color: #000;
+}
+
+/* Canvas-relative sizing only while #screen-scale is transformed, to avoid
+   a transform/vw mismatch on ultrawide/mobile. */
+body.fit-active #lobby-mode.lobby-split:not(.hide) {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+/* the split screen carries its own faint title; hide the large gold one,
+   which is left for the create/join sub-views */
+#lobby:has(#lobby-mode:not(.hide)) #lobby-title {
+	display: none;
+}
+
+/* faint watermark title across the very top */
+.split-title {
+	position: absolute;
+	top: 1.5rem;
+	left: 0;
+	right: 0;
+	z-index: 10;
+	text-align: center;
+	font-family: sans-serif;
+	font-size: 10px;
+	letter-spacing: 6px;
+	text-transform: uppercase;
+	color: rgba(255,255,255,0.2);
+	pointer-events: none;
+}
+
+/* The offline package has no relay endpoint. Keep the original online lobby
+   in the source for explicit ?server=... use, but do not expose it normally. */
+body.offline-build #split-player,
+body.offline-build .split-divider {
+	display: none;
+}
+
+body.offline-build #lobby-mode.lobby-split:not(.hide) {
+	justify-content: center;
+}
+
+#offline-note {
+	position: absolute;
+	left: 50%;
+	bottom: 1rem;
+	z-index: 10;
+	width: min(90vw, 640px);
+	margin: 0;
+	transform: translateX(-50%);
+	text-align: center;
+	font-family: sans-serif;
+	font-size: 10px;
+	letter-spacing: 1px;
+	line-height: 1.5;
+	color: rgba(255,255,255,0.45);
+	pointer-events: none;
+}
+
+html:not(.offline-build) #offline-note {
+	display: none;
+}
+
+.split-panel {
+	position: relative;
+	flex: 1;
+	height: 100%;
+	overflow: hidden;
+	cursor: pointer;
+	transition: flex .6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.split-image {
+	position: absolute;
+	inset: 0;
+	background-size: cover;
+	background-position: center;
+	filter: grayscale(100%) brightness(.35);
+	transform: scale(1.02);
+	transition: filter .6s ease, transform .6s ease;
+}
+
+#split-computer .split-image {
+	background-image: url("img/multiplayer/bg-left.png");
+	background-position: 18% top;
+}
+
+#split-player .split-image {
+	background-image: url("img/multiplayer/bg-right.png");
+	background-position: center top;
+}
+
+.split-panel::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	opacity: .06;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	background-size: 180px 180px;
+}
+
+.split-vignette {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background:
+		linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 12%, rgba(0,0,0,0) 45%),
+		linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 25%),
+		radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%);
+	transition: opacity .6s ease;
+}
+
+.split-label {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 2.5rem;
+	z-index: 3;
+	text-align: center;
+	pointer-events: none;
+}
+
+.split-tag {
+	display: block;
+	font-family: sans-serif;
+	/* Clamp instead of fixed size so long translations shrink instead of wrapping. */
+	font-size: clamp(7px, 2.1vw, 10px);
+	/* Clamp letter-spacing too, same reason. */
+	letter-spacing: clamp(1px, 0.6vw, 4px);
+	text-transform: uppercase;
+	color: rgba(255,255,255,0.35);
+	margin-bottom: 10px;
+	transition: color .5s ease, letter-spacing .5s ease;
+}
+
+.split-heading {
+	margin: 0;
+	font-family: Georgia, serif;
+	font-weight: 400;
+	/* Clamp heading size too, same reason. */
+	font-size: clamp(15px, 5vw, 26px);
+	letter-spacing: 2px;
+	color: rgba(255,255,255,0.3);
+	transition: color .5s ease, text-shadow .5s ease, letter-spacing .5s ease;
+}
+
+.split-play {
+	margin-top: 18px;
+	padding: 10px 32px;
+	font-family: sans-serif;
+	font-size: 10px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	border-radius: 1px;
+	border: 1px solid rgba(255,255,255,0.1);
+	color: rgba(255,255,255,0.15);
+	background: transparent;
+	cursor: pointer;
+	pointer-events: auto;
+	opacity: 0;
+	transform: translateY(12px);
+	transition: all .5s ease;
+}
+
+.split-panel:hover {
+	flex: 1.12;
+}
+
+.split-panel:hover .split-image {
+	filter: grayscale(0%) brightness(.85) contrast(1.05) saturate(1.1);
+	transform: scale(1);
+}
+
+.split-panel:hover .split-vignette {
+	opacity: .85;
+}
+
+.split-panel:hover .split-tag {
+	color: rgba(255,210,120,0.9);
+	letter-spacing: 5px;
+}
+
+.split-panel:hover .split-heading {
+	color: #ffffff;
+	letter-spacing: 3px;
+	text-shadow: 0 0 30px rgba(255,160,40,0.7), 0 0 60px rgba(255,120,20,0.3);
+}
+
+.split-panel:hover .split-play {
+	opacity: 1;
+	transform: translateY(0);
+	border: 1px solid rgba(255,200,80,0.5);
+	color: rgba(255,215,130,1);
+	background: rgba(0,0,0,0.3);
+	box-shadow: 0 0 20px rgba(255,160,40,0.15);
+}
+
+.split-divider {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	width: 1px;
+	transform: translateX(-50%);
+	z-index: 5;
+	pointer-events: none;
+	background: linear-gradient(to bottom,
+		transparent 0%,
+		rgba(255,255,255,0.1) 20%,
+		rgba(255,255,255,0.25) 50%,
+		rgba(255,255,255,0.1) 80%,
+		transparent 100%);
+	transition: left .6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.lobby-split:has(#split-computer:hover) .split-divider {
+	left: 52.83%;
+}
+
+.lobby-split:has(#split-player:hover) .split-divider {
+	left: 47.17%;
+}
+
+.split-badge {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 46px;
+	height: 46px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: rgba(8,6,4,0.95);
+	border: 1px solid rgba(255,255,255,0.15);
+	color: rgba(255,255,255,0.3);
+	font-size: 18px;
+	transition: border-color .4s ease, color .4s ease, box-shadow .4s ease;
+}
+
+.lobby-split:hover .split-badge {
+	border-color: rgba(255,200,80,0.4);
+	color: rgba(255,210,120,0.7);
+	box-shadow: 0 0 20px rgba(255,160,40,0.15);
+}
+
+@media (min-width: 1600px) and (min-aspect-ratio: 2/1) {
+	.split-title {
+		font-size: 13px;
+	}
+	.split-tag {
+		font-size: clamp(10px, 2.1vw, 14px);
+	}
+	.split-heading {
+		font-size: clamp(20px, 5vw, 34px);
+	}
+	.split-play {
+		font-size: 13px;
+		padding: 13px 40px;
+	}
+	.split-badge {
+		width: 64px;
+		height: 64px;
+		font-size: 26px;
+	}
+	.mp-subtitle {
+		font-size: 18px;
+	}
+	.mp-option-tag {
+		font-size: 16px;
+	}
+	.mp-option-desc {
+		font-size: 18px;
+	}
+	.mp-back {
+		font-size: 15px;
+	}
+	.lobby-hint {
+		font-size: 15px;
+	}
+	.lobby-status {
+		font-size: 15px;
+	}
+	.mp-action-button {
+		font-size: 15px;
+	}
+}
+
+/* ----- multiplayer status strip in the deck builder ----- */
+
+#mp-status {
+	position: absolute;
+	top: 3vw;
+	left: 1vw;
+	font-size: .9vw;
+	color: rgba(255, 255, 255, 0.75);
+	z-index: 90;
+}
+
+/* deck editing is locked while the local player is readied up */
+.mp-locked #card-bank,
+.mp-locked #card-deck,
+.mp-locked #card-leader,
+.mp-locked .deck-options {
+	pointer-events: none;
+	opacity: .55;
+}
+
+/* Subtle, non-blocking hint nudging the player toward fullscreen. Shown once
+   per session — in the deck builder (top) and when a game starts (bottom) —
+   only if the window isn't already fullscreen. Fades via the .hide toggle. */
+.fs-hint {
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 0.9vw;
+	padding: 0.6vw 1.1vw;
+	background: rgba(0, 0, 0, 1);
+	border: 1px solid rgba(218, 165, 32, 0.7);
+	border-radius: 0.4vw;
+	color: goldenrod;
+	font-family: Arial Narrow, sans-serif;
+	font-size: 1.1vw;
+	box-shadow: 0 0.2vw 1vw rgba(0, 0, 0, 0.6);
+	pointer-events: auto;
+	transition: opacity 0.4s ease;
+}
+
+/* in-game: fixed to the bottom of the viewport */
+#fullscreen-hint {
+	position: fixed;
+	bottom: 1.6vw;
+	z-index: 95;
+}
+
+.fs-hint.hide {
+	display: flex;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.fs-hint-text {
+	cursor: pointer;
+}
+
+.fs-hint-text:hover {
+	color: #ffd864;
+}
+
+.fs-hint-close {
+	cursor: pointer;
+	font-size: 1.4vw;
+	line-height: 1;
+	color: rgba(218, 165, 32, 0.7);
+}
+
+.fs-hint-close:hover {
+	color: goldenrod;
+}
+
+/* ----------- keyboard controls ------------------ */
+
+/* The single highlight cursor shared by mouse and keyboard (hand card, board
+   row, special slot, weather row or a decoy target). The outline + glow draw
+   the ring without affecting layout; hand cards additionally lift so the
+   focused card pops out of the fanned-out hand. */
+.kb-focus {
+	outline: 0.2vw solid gold !important;
+	outline-offset: -0.2vw;
+	box-shadow: 0 0 0.7vw 0.1vw rgba(255, 215, 0, 0.8) !important;
+	border-radius: 0.3vw;
+	z-index: 3;
+}
+.card.kb-focus {
+	margin-bottom: 1vw;
+}
+
+/* "?" shortcut-legend toggle: sits flush against the exit button (top-left).
+   Exit is at left:1vw width:2vw (ends at ~3vw); this 3vw button butts right up
+   to it, raised so its centre lines up with the smaller exit icon. */
+#toggle-keybinds {
+	top: 0.9vw;
+	left: 3vw;
+	width: 3vw;
+	height: 3vw;
+}
+#toggle-keybinds.deck-menu {
+	display: none !important;
+}
+#toggle-keybinds > span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 3vw;
+	height: 3vw;
+	font-family: Arial Narrow, sans-serif;
+	font-size: 2.6vw;
+	font-weight: bold;
+	color: goldenrod;
+	filter: drop-shadow(0px 0px 2px black);
+}
+#toggle-keybinds:hover > span {
+	color: #ffd864;
+	filter: drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.5));
+}
+
+/* Feedback button: shown in the lobby cluster and the deck builder, hidden
+   during a match. Mirrors the music/sfx settings buttons. */
+#toggle-feedback {
+	display: none;
+}
+#toggle-feedback.deck-menu,
+#toggle-feedback.lobby-menu {
+	display: block;
+	position: fixed;
+	bottom: 2vh;
+	top: auto;
+	right: 1.5vw;
+	left: auto;
+	z-index: 95;
+}
+
+#lang-select {
+	display: none;
+	position: fixed;
+	top: 0.9vw;
+	right: 4.5vw;
+	z-index: 96;
+	font-family: Arial Narrow, sans-serif;
+	font-weight: bold;
+}
+
+#lobby:not(.hide) ~ #lang-select {
+	display: block;
+}
+
+#lobby-fullscreen-toggle {
+	display: none;
+	position: fixed;
+	top: 0.9vw;
+	right: 1.5vw;
+	width: 2.5vw;
+	height: 2.5vw;
+	z-index: 96;
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+}
+#lobby-fullscreen-toggle > img {
+	width: 1.6vw;
+	height: 1.6vw;
+}
+#lobby-fullscreen-toggle:not(.fade) > img {
+	opacity: 0.85;
+}
+
+#lobby:not(.hide) ~ #lobby-fullscreen-toggle {
+	display: flex;
+}
+
+.lang-trigger {
+	display: flex;
+	align-items: center;
+	gap: 0.4vw;
+	height: 2.5vw;
+	padding: 0;
+	background: transparent;
+	border: none;
+	color: goldenrod;
+	font: inherit;
+	font-size: 1.05vw;
+	filter: drop-shadow(0px 0px 2px black);
+	transition: color 0.12s ease, filter 0.12s ease;
+}
+.lang-trigger:hover {
+	color: #e8c165;
+	filter: drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.25));
+}
+.lang-globe {
+	width: 1.6vw;
+	height: 1.6vw;
+	flex-shrink: 0;
+}
+.lang-current {
+	line-height: 1;
+}
+
+.lang-menu {
+	position: absolute;
+	top: calc(100% + 0.3vw);
+	right: 0;
+	min-width: 100%;
+	/* vw not vh: stays consistent with the canvas's frame once
+	   #screen-scale is transformed. */
+	max-height: 34vw;
+	margin: 0;
+	padding: 0.2vw;
+	list-style: none;
+	overflow-y: auto;
+	background: #0d0d0d;
+	border: 1px solid rgba(218, 165, 32, 0.5);
+	border-radius: 0.3vw;
+	box-shadow: 0 0.3vw 0.8vw rgba(0, 0, 0, 0.7);
+	opacity: 0;
+	transform: translateY(-0.3vw);
+	pointer-events: none;
+	transition: opacity 0.12s ease, transform 0.12s ease;
+}
+#lang-select.open .lang-menu {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+.lang-menu > li {
+	padding: 0.3vw 0.6vw;
+	color: goldenrod;
+	font-size: 1vw;
+	white-space: nowrap;
+	border-radius: 0.2vw;
+	transition: background 0.1s ease, color 0.1s ease;
+}
+.lang-menu > li:hover,
+.lang-menu > li:focus {
+	background: rgba(218, 165, 32, 0.18);
+	color: #ffd864;
+	outline: none;
+}
+.lang-menu > li[aria-selected="true"] {
+	background: rgba(218, 165, 32, 0.3);
+	color: #fff2cc;
+}
+
+/* Slim, themed scrollbar for the language list */
+.lang-menu::-webkit-scrollbar {
+	width: 0.5vw;
+}
+.lang-menu::-webkit-scrollbar-thumb {
+	background: rgba(218, 165, 32, 0.4);
+	border-radius: 0.25vw;
+}
+.lang-menu::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+/* Shortcut legend overlay */
+#keybind-legend {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.7);
+}
+#keybind-legend.hide {
+	display: none;
+}
+.kb-legend-panel {
+	position: relative;
+	min-width: 26vw;
+	max-width: 80vw;
+	padding: 1.6vw 2vw 1.4vw;
+	background: rgba(10, 10, 10, 0.97);
+	border: 1px solid rgba(218, 165, 32, 0.7);
+	border-radius: 0.5vw;
+	box-shadow: 0 0.4vw 2vw rgba(0, 0, 0, 0.7);
+	color: goldenrod;
+	font-family: Arial Narrow, sans-serif;
+}
+.kb-legend-panel h2 {
+	margin: 0 0 1vw;
+	font-size: 1.7vw;
+	text-align: center;
+	letter-spacing: 0.05vw;
+}
+.kb-legend-panel table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 1.15vw;
+}
+.kb-legend-panel td {
+	padding: 0.45vw 0.6vw;
+	vertical-align: middle;
+}
+.kb-legend-panel td:first-child {
+	white-space: nowrap;
+	text-align: right;
+	padding-right: 1.2vw;
+}
+.kb-legend-panel td:last-child {
+	color: #e8d8b0;
+}
+.kb-legend-panel tr.kb-sep > td {
+	border-top: 1px solid rgba(218, 165, 32, 0.25);
+	padding-top: 0.8vw;
+}
+.kb-legend-panel kbd {
+	display: inline-block;
+	min-width: 1.1vw;
+	padding: 0.15vw 0.5vw;
+	background: rgba(218, 165, 32, 0.12);
+	border: 1px solid rgba(218, 165, 32, 0.6);
+	border-radius: 0.3vw;
+	font-family: inherit;
+	font-size: 1.05vw;
+	color: goldenrod;
+	text-align: center;
+}
+.kb-legend-panel kbd.kb-arrow {
+	width: 1.9vw;
+	min-width: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+.kb-legend-panel .kb-hold {
+	font-size: 0.85vw;
+	color: rgba(218, 165, 32, 0.7);
+	font-style: italic;
+}
+.kb-legend-close {
+	position: absolute;
+	top: 0.5vw;
+	right: 0.9vw;
+	font-size: 1.8vw;
+	line-height: 1;
+	color: rgba(218, 165, 32, 0.7);
+	cursor: pointer;
+}
+.kb-legend-close:hover {
+	color: goldenrod;
+}
+
+/* Feedback modal: reuses the shortcut-legend overlay look */
+#feedback-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.7);
+}
+#feedback-modal.hide {
+	display: none;
+}
+.fb-panel {
+	position: relative;
+	min-width: 24vw;
+	max-width: 34vw;
+	padding: 1.6vw 2vw 1.4vw;
+	background: rgba(10, 10, 10, 0.97);
+	border: 1px solid rgba(218, 165, 32, 0.7);
+	border-radius: 0.5vw;
+	box-shadow: 0 0.4vw 2vw rgba(0, 0, 0, 0.7);
+	color: goldenrod;
+	font-family: Arial Narrow, sans-serif;
+	text-align: center;
+}
+.fb-panel h2 {
+	margin: 0 0 0.8vw;
+	font-size: 1.7vw;
+	letter-spacing: 0.05vw;
+}
+.fb-intro {
+	margin: 0 0 1.2vw;
+	font-size: 1.1vw;
+	color: #e8d8b0;
+}
+.fb-actions {
+	display: flex;
+	gap: 1vw;
+	justify-content: center;
+}
+.fb-offline {
+	max-width: 560px;
+	margin: 0 auto;
+	color: rgba(255,255,255,0.65);
+	line-height: 1.6;
+}
+.fb-btn {
+	display: inline-block;
+	padding: 0.6vw 1.2vw;
+	background: rgba(218, 165, 32, 0.12);
+	border: 1px solid rgba(218, 165, 32, 0.6);
+	border-radius: 0.3vw;
+	font-size: 1.15vw;
+	color: goldenrod;
+	text-decoration: none;
+	cursor: pointer;
+}
+.fb-btn:hover {
+	background: rgba(218, 165, 32, 0.25);
+	color: #ffd864;
+}
+.fb-repo {
+	display: inline-block;
+	margin-top: 1.1vw;
+	font-size: 0.95vw;
+	color: rgba(218, 165, 32, 0.7);
+	text-decoration: none;
+}
+.fb-repo:hover {
+	color: goldenrod;
+	text-decoration: underline;
+}
+.fb-close {
+	position: absolute;
+	top: 0.5vw;
+	right: 0.9vw;
+	font-size: 1.8vw;
+	line-height: 1;
+	color: rgba(218, 165, 32, 0.7);
+	cursor: pointer;
+}
+.fb-close:hover {
+	color: goldenrod;
+}
+
+/* Hold-to-pass progress: a bar that fills along the bottom of the Pass button
+   while P / F is held. Reaching full width (1s) commits the pass. Kept off the
+   text and out of overflow so the existing hover tooltip is never clipped. */
+#pass-button::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 0.1vw;
+	width: 0;
+	background: goldenrod;
+	box-shadow: 0 0 0.25vw goldenrod;
+	border-radius: 0.1vw;
+	pointer-events: none;
+}
+#pass-button.kb-pass-hold::before {
+	width: 100%;
+	transition: width 1s linear;
+}
